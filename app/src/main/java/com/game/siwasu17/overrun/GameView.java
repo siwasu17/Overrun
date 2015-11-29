@@ -6,7 +6,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Handler;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,7 +26,9 @@ import java.util.Random;
 /**
  * Created by yasu on 21/11/27.
  */
-public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+public class GameView extends SurfaceView
+        implements SurfaceHolder.Callback, SensorEventListener {
+    private static final String LOG_TAG = GameView.class.getSimpleName();
 
     /**
      * Game Loop
@@ -69,6 +78,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         startDrawThread();
+        startSensor();
     }
 
     @Override
@@ -79,16 +89,97 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         stopDrawThread();
+        stopSensor();
+    }
+
+    /**
+     * ジェスチャー認識
+     */
+    private GestureDetector mDetector;
+    private OnGestureListener mGestureListener
+            = new OnGestureListener() {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            Log.i(LOG_TAG,"Down");
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            Log.i(LOG_TAG,"Tap");
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.i(LOG_TAG,"Scroll!!!");
+            return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.i(LOG_TAG,"LongPress!!!");
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.i(LOG_TAG,"Flick!!!");
+            return false;
+        }
+    };
+
+    //Activityのタッチイベントから呼んでもらうため
+    public GestureDetector getGestureDetector(){
+        return this.mDetector;
+    }
+
+    /**
+     * 加速度センサー処理系
+     * @param event
+     */
+    private float[] sensorValues = null;
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(sensorValues == null){
+            sensorValues = new float[3];
+        }
+        sensorValues[0] = event.values[0];
+        sensorValues[1] = event.values[1];
+        sensorValues[2] = event.values[2];
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    public void startSensor(){
+        sensorValues = null;
+        SensorManager sensorManager = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this,accelerometer,SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    public void stopSensor(){
+        SensorManager sensorManager = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
+        sensorManager.unregisterListener(this);
     }
 
     /**
      * Game Main
      */
-
     private static final int POWER_GAUGE_HEIGHT = 30;
     private static final Paint PAINT_POWER_GAUGE = new Paint();
+    private static final Paint TEXT_PAINT = new Paint();
     static {
         PAINT_POWER_GAUGE.setColor(Color.RED);
+        TEXT_PAINT.setColor(Color.WHITE);
+        TEXT_PAINT.setTextSize(40f);
     }
 
     public interface Callback{
@@ -110,10 +201,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public GameView(Context context) {
         super(context);
-
+        mDetector = new GestureDetector(context,mGestureListener);
         handler = new Handler();
         getHolder().addCallback(this);
     }
+
 
     private void gameOver(){
         if(isGameOver){
@@ -130,37 +222,47 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         });
     }
 
-    private boolean isTouchDown = false;
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                touchDownStartTime = System.currentTimeMillis();
-                isTouchDown = true;
-                return true;
-            case MotionEvent.ACTION_UP:
-                isTouchDown = false;
-                touchDownStartTime = 0;
-                return true;
-            default:
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
-
+    /**
+     * 全体の描画系
+     * @param canvas
+     */
     public void drawGame(Canvas canvas) {
         int width = canvas.getWidth();
         int height = canvas.getHeight();
 
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(Color.BLACK);
+
+        if(ball == null){
+            ball = new Ball(width/2,height/2,20);
+        }
+
+        //加速度を表示
+        if(sensorValues != null){
+            canvas.drawText("sensor[0]: " + sensorValues[0],10,150,TEXT_PAINT);
+            canvas.drawText("sensor[1]: " + sensorValues[1],10,200,TEXT_PAINT);
+            canvas.drawText("sensor[2]: " + sensorValues[2],10,250,TEXT_PAINT);
+
+            //ボールに加速度を加える
+            ball.setAccel(-(sensorValues[0]/10),sensorValues[1]/10);
+        }
+
+        ball.move();
+        ball.draw(canvas);
+
+
 
         //ゲージを表示
+        /*
         if(touchDownStartTime > 0){
             float elapsedTime = System.currentTimeMillis() - touchDownStartTime;
             canvas.drawRect(0,0,width * (elapsedTime / MAX_TOUCH_TIME),POWER_GAUGE_HEIGHT,PAINT_POWER_GAUGE);
         }
-
+        */
     }
 
+    /**
+     * Game Objects
+     */
+    private Ball ball;
 }

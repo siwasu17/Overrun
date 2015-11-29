@@ -2,11 +2,15 @@ package com.game.siwasu17.overrun;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements GameView.Callback{
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private GameView gameView;
 
@@ -20,6 +24,12 @@ public class MainActivity extends ActionBarActivity implements GameView.Callback
         super.onCreate(savedInstanceState);
         gameView = new GameView(this);
         setContentView(gameView);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gameView.getGestureDetector().onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     @Override

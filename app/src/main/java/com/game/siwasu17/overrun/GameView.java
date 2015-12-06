@@ -78,7 +78,7 @@ public class GameView extends SurfaceView
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         startDrawThread();
-        startSensor();
+        //startSensor();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class GameView extends SurfaceView
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         stopDrawThread();
-        stopSensor();
+        //stopSensor();
     }
 
     /**
@@ -100,7 +100,7 @@ public class GameView extends SurfaceView
             = new OnGestureListener() {
         @Override
         public boolean onDown(MotionEvent e) {
-            Log.i(LOG_TAG,"Down");
+            Log.i(LOG_TAG, "Down");
             return false;
         }
 
@@ -111,41 +111,47 @@ public class GameView extends SurfaceView
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            Log.i(LOG_TAG,"Tap");
+            Log.i(LOG_TAG, "Tap");
             return false;
         }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.i(LOG_TAG,"Scroll!!!");
+            //Log.i(LOG_TAG,"Scroll!!!");
             return false;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
-            Log.i(LOG_TAG,"LongPress!!!");
+            Log.i(LOG_TAG, "LongPress!!!");
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.i(LOG_TAG,"Flick!!!");
+            Log.i(LOG_TAG, "[Flick] X:" + velocityX + " Y:" + velocityY);
+            if (ball != null) {
+                ball.setVelocity(velocityX * 0.005f, velocityY * 0.005f);
+            }
+
             return false;
         }
     };
 
     //Activityのタッチイベントから呼んでもらうため
-    public GestureDetector getGestureDetector(){
+    public GestureDetector getGestureDetector() {
         return this.mDetector;
     }
 
     /**
      * 加速度センサー処理系
+     *
      * @param event
      */
     private float[] sensorValues = null;
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(sensorValues == null){
+        if (sensorValues == null) {
             sensorValues = new float[3];
         }
         sensorValues[0] = event.values[0];
@@ -158,15 +164,15 @@ public class GameView extends SurfaceView
 
     }
 
-    public void startSensor(){
+    public void startSensor() {
         sensorValues = null;
-        SensorManager sensorManager = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this,accelerometer,SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
-    public void stopSensor(){
-        SensorManager sensorManager = (SensorManager)getContext().getSystemService(Context.SENSOR_SERVICE);
+    public void stopSensor() {
+        SensorManager sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         sensorManager.unregisterListener(this);
     }
 
@@ -176,19 +182,20 @@ public class GameView extends SurfaceView
     private static final int POWER_GAUGE_HEIGHT = 30;
     private static final Paint PAINT_POWER_GAUGE = new Paint();
     private static final Paint TEXT_PAINT = new Paint();
+
     static {
         PAINT_POWER_GAUGE.setColor(Color.RED);
         TEXT_PAINT.setColor(Color.WHITE);
         TEXT_PAINT.setTextSize(40f);
     }
 
-    public interface Callback{
+    public interface Callback {
         void onGameOver();
     }
 
     private Callback callback;
 
-    public void setCallback(Callback callback){
+    public void setCallback(Callback callback) {
         this.callback = callback;
     }
 
@@ -201,14 +208,14 @@ public class GameView extends SurfaceView
 
     public GameView(Context context) {
         super(context);
-        mDetector = new GestureDetector(context,mGestureListener);
+        mDetector = new GestureDetector(context, mGestureListener);
         handler = new Handler();
         getHolder().addCallback(this);
     }
 
 
-    private void gameOver(){
-        if(isGameOver){
+    private void gameOver() {
+        if (isGameOver) {
             return;
         }
         isGameOver = true;
@@ -225,6 +232,7 @@ public class GameView extends SurfaceView
 
     /**
      * 全体の描画系
+     *
      * @param canvas
      */
     public void drawGame(Canvas canvas) {
@@ -233,11 +241,22 @@ public class GameView extends SurfaceView
 
         canvas.drawColor(Color.BLACK);
 
-        if(ball == null){
-            ball = new Ball(width/2,height/2,20);
+        if (ball == null) {
+            ball = new Ball(width / 2, height / 2, 10);
+        } else {
+            //ballの状態を表示(Util化したい)
+            List<String> statTextList = new ArrayList<>();
+            statTextList.add("X: " + ball.centerX);
+            statTextList.add("Y: " + ball.centerY);
+            statTextList.add("VX: " + ball.velX);
+            statTextList.add("VY: " + ball.velY);
+            for(int i =0;i < statTextList.size();i++){
+                canvas.drawText(statTextList.get(i),10,100 + (50 * i),TEXT_PAINT);
+            }
         }
 
         //加速度を表示
+        /*
         if(sensorValues != null){
             canvas.drawText("sensor[0]: " + sensorValues[0],10,150,TEXT_PAINT);
             canvas.drawText("sensor[1]: " + sensorValues[1],10,200,TEXT_PAINT);
@@ -246,11 +265,11 @@ public class GameView extends SurfaceView
             //ボールに加速度を加える
             ball.setAccel(-(sensorValues[0]/10),sensorValues[1]/10);
         }
+        */
+
 
         ball.move();
         ball.draw(canvas);
-
-
 
         //ゲージを表示
         /*

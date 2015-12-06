@@ -9,6 +9,10 @@ import android.graphics.Paint;
  */
 public class Ball {
     private final Paint paint = new Paint();
+    //常に速度を減衰させるようにするモード
+    boolean isBraking = false;
+    final float decayRate = 0.97f;//減衰率
+    final float stopVelRange = 0.5f;//停止する限界速度
     float centerX;
     float centerY;
     float radius;
@@ -29,6 +33,8 @@ public class Ball {
         //速度
         this.velX = 0;
         this.velY = 0;
+        //ブレーキON
+        this.isBraking = true;
 
         //初期色
         paint.setColor(color.argb(255,100,255,255));
@@ -40,12 +46,34 @@ public class Ball {
         this.accelY = ay;
     }
 
-    public void move(){
-        velX += accelX;
-        velY += accelY;
+    public void setVelocity(float vx,float vy){
+        this.velX = vx;
+        this.velY = vy;
+    }
 
-        centerX += velX;
-        centerY += velY;
+    public void move(){
+        if(isBraking){
+            //ブレーキ機能がオンの時
+            velX *= decayRate;
+            if(Math.abs(velX) < stopVelRange){
+                velX = 0;
+            }
+
+            velY *= decayRate;
+            if(Math.abs(velY) < stopVelRange){
+                velY = 0;
+            }
+
+            centerX += velX;
+            centerY += velY;
+
+        }else {
+            velX += accelX;
+            velY += accelY;
+
+            centerX += velX;
+            centerY += velY;
+        }
     }
 
     public void draw(Canvas canvas){

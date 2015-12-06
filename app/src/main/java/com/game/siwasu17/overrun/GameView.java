@@ -242,16 +242,33 @@ public class GameView extends SurfaceView
         canvas.drawColor(Color.BLACK);
 
         if (ball == null) {
-            ball = new Ball(width / 2, height / 2, 10);
+            float halfWidth = width/2;
+            float halfHeight = height/2;
+            float ballR = 10;
+
+            ball = new Ball(halfWidth,halfHeight,ballR);
+
+            //追従者を生成
+            for (int i = 0; i < 5; i++) {
+                float offsetX = rand.nextInt(100) + (ballR * 2);
+                float offsetY = rand.nextInt(100) + (ballR * 2);
+
+                FollowBall fb  = new FollowBall(halfWidth + offsetX, halfHeight + offsetY,ballR);
+                fb.setParentBall(ball);
+                fb.setColor(Color.YELLOW);
+                followers.add(fb);
+            }
+
         } else {
-            //ballの状態を表示(Util化したい)
+            //ballの状態を表示
+            //TODO: Util化
             List<String> statTextList = new ArrayList<>();
             statTextList.add("X: " + ball.centerX);
             statTextList.add("Y: " + ball.centerY);
             statTextList.add("VX: " + ball.velX);
             statTextList.add("VY: " + ball.velY);
-            for(int i =0;i < statTextList.size();i++){
-                canvas.drawText(statTextList.get(i),10,100 + (50 * i),TEXT_PAINT);
+            for (int i = 0; i < statTextList.size(); i++) {
+                canvas.drawText(statTextList.get(i), 10, 100 + (50 * i), TEXT_PAINT);
             }
         }
 
@@ -271,6 +288,11 @@ public class GameView extends SurfaceView
         ball.move();
         ball.draw(canvas);
 
+        for(Ball b : followers){
+            b.move();
+            b.draw(canvas);
+        }
+
         //ゲージを表示
         /*
         if(touchDownStartTime > 0){
@@ -284,4 +306,5 @@ public class GameView extends SurfaceView
      * Game Objects
      */
     private Ball ball;
+    private ArrayList<Ball> followers = new ArrayList<>();
 }

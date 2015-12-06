@@ -8,6 +8,7 @@ import android.graphics.Paint;
  * Created by yasu on 15/11/30.
  */
 public class Ball {
+    protected final String LOG_TAG = getClass().getSimpleName();
     private final Paint paint = new Paint();
     //常に速度を減衰させるようにするモード
     boolean isBraking = false;
@@ -39,6 +40,10 @@ public class Ball {
         //初期色
         paint.setColor(color.argb(255,100,255,255));
         paint.setAntiAlias(true);
+    }
+
+    public void setColor(int color){
+        this.paint.setColor(color);
     }
 
     public void setAccel(float ax,float ay){

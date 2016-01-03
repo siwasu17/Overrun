@@ -14,7 +14,7 @@ public class Ball {
     boolean isBraking = false;
     final float decayRate = 0.97f;//減衰率
     final float stopVelRange = 0.5f;//停止する限界速度
-    final float MAX_VELOCITY = 30.0f;
+    final float maxVelocity = 30.0f;
     float centerX;
     float centerY;
     float radius;
@@ -75,9 +75,9 @@ public class Ball {
         float oblique = (float)Math.sqrt(velX*velX + velY*velY);
         float sin = velX / oblique;
         float cos = velY / oblique;
-        if(oblique > MAX_VELOCITY) {
-            velX = MAX_VELOCITY * sin;
-            velY = MAX_VELOCITY * cos;
+        if(oblique > maxVelocity) {
+            velX = maxVelocity * sin;
+            velY = maxVelocity * cos;
         }
     }
 

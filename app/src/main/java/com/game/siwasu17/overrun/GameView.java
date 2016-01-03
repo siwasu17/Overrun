@@ -255,11 +255,12 @@ public class GameView extends SurfaceView
             ball = new Ball(halfWidth,halfHeight,ballR);
 
             //追従者を生成
-            for (int i = 0; i < 5; i++) {
-                float offsetX = rand.nextInt(100) + (ballR * 2);
-                float offsetY = rand.nextInt(100) + (ballR * 2);
+            for (int i = 0; i < 20; i++) {
+                float offsetX = rand.nextInt(width);
+                float offsetY = rand.nextInt(height);
 
-                FollowBall fb  = new FollowBall(halfWidth + offsetX, halfHeight + offsetY,ballR);
+                //FollowBall fb  = new FollowBall(halfWidth + offsetX, halfHeight + offsetY,ballR);
+                FollowBall fb  = new FollowBall(offsetX,offsetY,ballR);
                 fb.setParentBall(ball);
                 fb.setColor(Color.YELLOW);
                 followers.add(fb);
@@ -267,7 +268,7 @@ public class GameView extends SurfaceView
 
         } else {
             //ballの状態を表示
-            //TODO: Util化
+            //メッセージ領域のクラスを作ってもいいかも
             List<String> statTextList = new ArrayList<>();
             statTextList.add("X: " + ball.centerX);
             statTextList.add("Y: " + ball.centerY);

@@ -7,7 +7,9 @@ import android.util.Log;
  */
 public class FollowBall extends Ball {
     private Ball parentBall; //追従対象
-    private final float offLimit = 200.0f; //近づける限界
+    boolean isFollowing = false;//追従中かどうか
+    private final float offLimit = 100.0f; //近づける限界
+    private final float inArea = 300.0f; //この範囲内に入ったら追従を開始する
 
 
     public FollowBall(float x, float y, float r) {
@@ -20,23 +22,30 @@ public class FollowBall extends Ball {
 
     @Override
     public void move() {
+        float distance = getDistanceFromAlpha();
+        if(isFollowing){
+            if(distance > offLimit){
+                //近づく限界までは近づいて良い
+                this.velX = (parentBall.centerX - this.centerX) / 20;
+                this.velY = (parentBall.centerY - this.centerY) / 20;
 
-        //if(getDistance() > offLimit) {
-            this.velX = (parentBall.centerX - this.centerX) / 10;
-            this.velY = (parentBall.centerY - this.centerY) / 10;
-
-            this.centerX += velX;
-            this.centerY += velY;
-        //}
+                if(Math.abs(this.velX) > 1.0f) {
+                    this.centerX += velX;
+                }
+                if(Math.abs(this.velY) > 1.0f) {
+                    this.centerY += velY;
+                }
+            }
+        }else{
+            //追従対象の一定範囲内にはいったら追従開始
+            if(distance <= inArea){
+                isFollowing = true;
+            }
+        }
     }
 
-    private float getDistance(){
-        //この辺りの処理もっと楽にできるような気がする
-        return getDistance(this.centerX,this.centerY,parentBall.centerX,parentBall.centerY);
-    }
-
-    private float getDistance(float x1, float y1, float x2, float y2) {
-        //TODO: Util化
-        return (float)Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    //追従対象からの距離を取得
+    private float getDistanceFromAlpha(){
+        return GameUtils.getDistance(this.centerX,this.centerY,parentBall.centerX,parentBall.centerY);
     }
 }

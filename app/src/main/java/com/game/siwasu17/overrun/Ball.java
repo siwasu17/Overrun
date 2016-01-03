@@ -14,6 +14,7 @@ public class Ball {
     boolean isBraking = false;
     final float decayRate = 0.97f;//減衰率
     final float stopVelRange = 0.5f;//停止する限界速度
+    final float MAX_VELOCITY = 30.0f;
     float centerX;
     float centerY;
     float radius;
@@ -56,22 +57,37 @@ public class Ball {
         this.velY = vy;
     }
 
+    public void decayVelocity(){
+        //ブレーキ機能がオンの時
+        velX *= decayRate;
+        if(Math.abs(velX) < stopVelRange){
+            velX = 0;
+        }
+
+        velY *= decayRate;
+        if(Math.abs(velY) < stopVelRange){
+            velY = 0;
+        }
+    }
+
+    public void limitMaxSpeed(){
+        //ベクトルの最大の長さが一定に収まるように調整
+        float oblique = (float)Math.sqrt(velX*velX + velY*velY);
+        float sin = velX / oblique;
+        float cos = velY / oblique;
+        if(oblique > MAX_VELOCITY) {
+            velX = MAX_VELOCITY * sin;
+            velY = MAX_VELOCITY * cos;
+        }
+    }
+
     public void move(){
         if(isBraking){
-            //ブレーキ機能がオンの時
-            velX *= decayRate;
-            if(Math.abs(velX) < stopVelRange){
-                velX = 0;
-            }
-
-            velY *= decayRate;
-            if(Math.abs(velY) < stopVelRange){
-                velY = 0;
-            }
+            decayVelocity();
+            limitMaxSpeed();
 
             centerX += velX;
             centerY += velY;
-
         }else {
             velX += accelX;
             velY += accelY;

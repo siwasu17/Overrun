@@ -117,7 +117,11 @@ public class GameView extends SurfaceView
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            //Log.i(LOG_TAG,"Scroll!!!");
+            Log.i(LOG_TAG,"[Scroll] X:" + distanceX + " Y:" + distanceY);
+            if (ball != null) {
+                ball.setVelocity(-distanceX, -distanceY);
+            }
+
             return false;
         }
 
@@ -128,10 +132,12 @@ public class GameView extends SurfaceView
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            /*
             Log.i(LOG_TAG, "[Flick] X:" + velocityX + " Y:" + velocityY);
             if (ball != null) {
                 ball.setVelocity(velocityX * 0.005f, velocityY * 0.005f);
             }
+            */
 
             return false;
         }
@@ -286,7 +292,21 @@ public class GameView extends SurfaceView
 
 
         ball.move();
+        //領域外に出ないように調整
+        if(ball.centerX > width){
+            ball.centerX = width;
+        }else if(ball.centerX < 0){
+            ball.centerX = 0;
+        }
+        if(ball.centerY > height){
+            ball.centerY = height;
+        }else if(ball.centerY < 0){
+            ball.centerY = 0;
+        }
+
         ball.draw(canvas);
+
+
 
         for(Ball b : followers){
             b.move();

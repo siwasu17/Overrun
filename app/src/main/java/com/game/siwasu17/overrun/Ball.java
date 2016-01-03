@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 /**
- * Created by yasu on 15/11/30.
+ * 操作するメインキャラ
  */
 public class Ball {
     protected final String LOG_TAG = getClass().getSimpleName();
@@ -39,7 +39,7 @@ public class Ball {
         this.isBraking = true;
 
         //初期色
-        paint.setColor(color.argb(255,100,255,255));
+        paint.setColor(this.color.argb(255,100,255,255));
         paint.setAntiAlias(true);
     }
 

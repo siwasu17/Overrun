@@ -3,7 +3,7 @@ package com.game.siwasu17.overrun;
 import android.util.Log;
 
 /**
- * Created by yasu on 15/12/06.
+ * メインキャラに追従するキャラ
  */
 public class FollowBall extends Ball {
     private Ball parentBall; //追従対象

@@ -24,7 +24,7 @@ import java.util.Random;
 
 
 /**
- * Created by yasu on 21/11/27.
+ * ゲーム画面
  */
 public class GameView extends SurfaceView
         implements SurfaceHolder.Callback, SensorEventListener {
@@ -150,8 +150,6 @@ public class GameView extends SurfaceView
 
     /**
      * 加速度センサー処理系
-     *
-     * @param event
      */
     private float[] sensorValues = null;
 

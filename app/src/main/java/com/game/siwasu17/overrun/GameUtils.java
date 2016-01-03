@@ -1,7 +1,7 @@
 package com.game.siwasu17.overrun;
 
 /**
- * Created by yasu on 16/01/03.
+ * 各種ユーティリティ関数用
  */
 public class GameUtils {
 

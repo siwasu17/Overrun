@@ -101,6 +101,9 @@ public class GameView extends SurfaceView
         @Override
         public boolean onDown(MotionEvent e) {
             Log.i(LOG_TAG, "Down");
+            if (ball != null) {
+                ball.forceBoost();
+            }
             return false;
         }
 

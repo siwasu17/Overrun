@@ -12,8 +12,11 @@ public class Ball {
     private final Paint paint = new Paint();
     //常に速度を減衰させるようにするモード
     boolean isBraking = false;
-    final float decayRate = 0.97f;//減衰率
+    final float defaultDecayRate = 0.97f;//減衰率
+    final float forceBoostRate = 2.0f;//強制加速
+    float decayRate = defaultDecayRate;
     final float stopVelRange = 0.5f;//停止する限界速度
+    final float minReactDose = 5.0f; //スクロールで動かすときの最小反応量
     final float maxVelocity = 30.0f;
     float centerX;
     float centerY;
@@ -53,8 +56,17 @@ public class Ball {
     }
 
     public void setVelocity(float vx,float vy){
-        this.velX = vx;
-        this.velY = vy;
+        float r = (float)Math.sqrt(vx*vx + vy*vy);
+        if(r > this.minReactDose) {
+            this.velX = vx;
+            this.velY = vy;
+
+            this.decayRate = defaultDecayRate;
+        }
+    }
+
+    public void forceBoost(){
+        this.decayRate = forceBoostRate;
     }
 
     public void decayVelocity(){

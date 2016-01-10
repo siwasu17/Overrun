@@ -101,9 +101,11 @@ public class GameView extends SurfaceView
         @Override
         public boolean onDown(MotionEvent e) {
             Log.i(LOG_TAG, "Down");
+            /*
             if (ball != null) {
                 ball.forceBoost();
             }
+            */
             return false;
         }
 
@@ -120,10 +122,12 @@ public class GameView extends SurfaceView
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            /*
             Log.i(LOG_TAG,"[Scroll] X:" + distanceX + " Y:" + distanceY);
             if (ball != null) {
                 ball.setVelocity(-distanceX, -distanceY);
             }
+            */
 
             return false;
         }
@@ -131,16 +135,18 @@ public class GameView extends SurfaceView
         @Override
         public void onLongPress(MotionEvent e) {
             Log.i(LOG_TAG, "LongPress!!!");
+            if (ball != null) {
+                ball.forceBoost();
+            }
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            /*
+
             Log.i(LOG_TAG, "[Flick] X:" + velocityX + " Y:" + velocityY);
             if (ball != null) {
-                ball.setVelocity(velocityX * 0.005f, velocityY * 0.005f);
+                ball.setVelocity(velocityX, velocityY);
             }
-            */
 
             return false;
         }
@@ -240,7 +246,7 @@ public class GameView extends SurfaceView
     /**
      * 全体の描画系
      *
-     * @param canvas
+     * @param canvas 描画するキャンパス
      */
     public void drawGame(Canvas canvas) {
         int width = canvas.getWidth();

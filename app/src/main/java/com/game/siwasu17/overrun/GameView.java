@@ -20,7 +20,6 @@ import android.view.SurfaceView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 
 /**
@@ -44,7 +43,7 @@ public class GameView extends SurfaceView
             while (!isFinished) {
                 Canvas canvas = holder.lockCanvas();
                 if (canvas != null) {
-                    drawGame(canvas);
+                    processGame(canvas);
                     holder.unlockCanvasAndPost(canvas);
                 }
                 try {
@@ -101,11 +100,6 @@ public class GameView extends SurfaceView
         @Override
         public boolean onDown(MotionEvent e) {
             Log.i(LOG_TAG, "Down");
-            /*
-            if (ball != null) {
-                ball.forceBoost();
-            }
-            */
             return false;
         }
 
@@ -135,18 +129,17 @@ public class GameView extends SurfaceView
         @Override
         public void onLongPress(MotionEvent e) {
             Log.i(LOG_TAG, "LongPress!!!");
-            if (ball != null) {
-                ball.forceBoost();
-            }
+            Ball ball = gm.getMainBall();
+            ball.forceBoost();
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
             Log.i(LOG_TAG, "[Flick] X:" + velocityX + " Y:" + velocityY);
-            if (ball != null) {
-                ball.setVelocity(velocityX, velocityY);
-            }
+            Ball ball = gm.getMainBall();
+            ball.setVelocity(velocityX / 100, velocityY / 100);
+
 
             return false;
         }
@@ -192,16 +185,6 @@ public class GameView extends SurfaceView
     /**
      * Game Main
      */
-    private static final int POWER_GAUGE_HEIGHT = 30;
-    private static final Paint PAINT_POWER_GAUGE = new Paint();
-    private static final Paint TEXT_PAINT = new Paint();
-
-    static {
-        PAINT_POWER_GAUGE.setColor(Color.RED);
-        TEXT_PAINT.setColor(Color.WHITE);
-        TEXT_PAINT.setTextSize(40f);
-    }
-
     public interface Callback {
         void onGameOver();
     }
@@ -214,7 +197,7 @@ public class GameView extends SurfaceView
 
     private final Handler handler;
     private boolean isGameOver;
-    private final Random rand = new Random();
+    private GameManager gm;
 
     private static final int MAX_TOUCH_TIME = 500; //msec
     private long touchDownStartTime;
@@ -244,90 +227,17 @@ public class GameView extends SurfaceView
 
 
     /**
-     * 全体の描画系
+     * ゲーム全体の進行・描画
      *
      * @param canvas 描画するキャンパス
      */
-    public void drawGame(Canvas canvas) {
-        int width = canvas.getWidth();
-        int height = canvas.getHeight();
-
-        canvas.drawColor(Color.BLACK);
-
-        if (ball == null) {
-            float halfWidth = width/2;
-            float halfHeight = height/2;
-            float ballR = 10;
-
-            ball = new Ball(halfWidth,halfHeight,ballR);
-
-            //追従者を生成
-            for (int i = 0; i < 20; i++) {
-                float offsetX = rand.nextInt(width);
-                float offsetY = rand.nextInt(height);
-
-                //FollowBall fb  = new FollowBall(halfWidth + offsetX, halfHeight + offsetY,ballR);
-                FollowBall fb  = new FollowBall(offsetX,offsetY,ballR);
-                fb.setParentBall(ball);
-                fb.setColor(Color.YELLOW);
-                followers.add(fb);
-            }
-
-        } else {
-            //ballの状態を表示
-            //メッセージ領域のクラスを作ってもいいかも
-            List<String> statTextList = new ArrayList<>();
-            statTextList.add("X: " + ball.centerX);
-            statTextList.add("Y: " + ball.centerY);
-            statTextList.add("VX: " + ball.velX);
-            statTextList.add("VY: " + ball.velY);
-            for (int i = 0; i < statTextList.size(); i++) {
-                canvas.drawText(statTextList.get(i), 10, 100 + (50 * i), TEXT_PAINT);
-            }
+    public void processGame(Canvas canvas) {
+        if (gm == null) {
+            gm = new GameManager(canvas);
+            gm.initializeWorld();
         }
-
-        //加速度を表示
-        /*
-        if(sensorValues != null){
-            canvas.drawText("sensor[0]: " + sensorValues[0],10,150,TEXT_PAINT);
-            canvas.drawText("sensor[1]: " + sensorValues[1],10,200,TEXT_PAINT);
-            canvas.drawText("sensor[2]: " + sensorValues[2],10,250,TEXT_PAINT);
-
-            //ボールに加速度を加える
-            ball.setAccel(-(sensorValues[0]/10),sensorValues[1]/10);
-        }
-        */
-
-
-        ball.move();
-        //領域外に出ないように調整
-        if(ball.centerX > width){
-            ball.centerX = width;
-        }else if(ball.centerX < 0){
-            ball.centerX = 0;
-        }
-        if(ball.centerY > height){
-            ball.centerY = height;
-        }else if(ball.centerY < 0){
-            ball.centerY = 0;
-        }
-
-        ball.draw(canvas);
-
-
-
-        for(Ball b : followers){
-            b.move();
-            b.draw(canvas);
-        }
-
-        //ゲージを表示
-        /*
-        if(touchDownStartTime > 0){
-            float elapsedTime = System.currentTimeMillis() - touchDownStartTime;
-            canvas.drawRect(0,0,width * (elapsedTime / MAX_TOUCH_TIME),POWER_GAUGE_HEIGHT,PAINT_POWER_GAUGE);
-        }
-        */
+        gm.update();
+        gm.draw();
     }
 
     /**

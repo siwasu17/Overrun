@@ -7,7 +7,7 @@ import android.graphics.Paint;
 /**
  * 操作するメインキャラ
  */
-public class Ball {
+public class Ball implements GameTask {
     protected final String LOG_TAG = getClass().getSimpleName();
     private final Paint paint = new Paint();
     //常に速度を減衰させるようにするモード
@@ -109,6 +109,12 @@ public class Ball {
         }
     }
 
+    @Override
+    public void update() {
+        move();
+    }
+
+    @Override
     public void draw(Canvas canvas){
         canvas.drawCircle(centerX,centerY,radius,paint);
     }

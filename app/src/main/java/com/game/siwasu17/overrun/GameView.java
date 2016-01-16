@@ -1,15 +1,7 @@
 package com.game.siwasu17.overrun;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -19,14 +11,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
  * ゲーム画面
  */
 public class GameView extends SurfaceView
-        implements SurfaceHolder.Callback, SensorEventListener {
+        implements SurfaceHolder.Callback {
     private static final String LOG_TAG = GameView.class.getSimpleName();
 
     /**
@@ -148,38 +139,6 @@ public class GameView extends SurfaceView
     //Activityのタッチイベントから呼んでもらうため
     public GestureDetector getGestureDetector() {
         return this.mDetector;
-    }
-
-    /**
-     * 加速度センサー処理系
-     */
-    private float[] sensorValues = null;
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (sensorValues == null) {
-            sensorValues = new float[3];
-        }
-        sensorValues[0] = event.values[0];
-        sensorValues[1] = event.values[1];
-        sensorValues[2] = event.values[2];
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    public void startSensor() {
-        sensorValues = null;
-        SensorManager sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-    }
-
-    public void stopSensor() {
-        SensorManager sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-        sensorManager.unregisterListener(this);
     }
 
     /**

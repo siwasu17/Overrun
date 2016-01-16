@@ -8,4 +8,5 @@ import android.graphics.Canvas;
 public interface GameTask {
     void update();
     void draw(Canvas canvas);
+    void offset(float x,float y);
 }

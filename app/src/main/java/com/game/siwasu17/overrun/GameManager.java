@@ -22,16 +22,11 @@ public class GameManager {
         TEXT_PAINT.setTextSize(40f);
     }
 
-    int maxWorldWidth;
-    int maxWorldHeight;
-
-    //ゲーム領域全体の原点に対するオフセット
-    float offsetX;
-    float offsetY;
-
     Canvas canvas;
     int viewWidth;
     int viewHeight;
+
+    float frontierY;
 
     private final Random rand = new Random();
 
@@ -45,14 +40,13 @@ public class GameManager {
         viewWidth = canvas.getWidth();
         viewHeight = canvas.getHeight();
 
-        maxWorldHeight = 1000;
-        maxWorldWidth = viewWidth;
-
-        offsetX = 0;
-        offsetY = 500;
+        frontierY = 400;
     }
 
     public void update(){
+        //画面スクロール用
+        float commonOffsetY = 0f;
+
         mainBall.update();
 
         if(mainBall.centerX > viewWidth){
@@ -62,13 +56,21 @@ public class GameManager {
         }
         if(mainBall.centerY > viewHeight){
             mainBall.centerY = viewHeight;
-        }else if(mainBall.centerY < 0){
-            mainBall.centerY = 0;
+        }else if(mainBall.centerY <= frontierY){
+            commonOffsetY = frontierY - mainBall.centerY;
+            mainBall.centerY = frontierY;
+
+            if(lot(1,6)) {
+                //スクロールしたらボール生成
+                createFollowBallRandom(viewWidth, 10);
+            }
         }
 
         for(GameTask task: taskList){
             task.update();
+            task.offset(0,commonOffsetY);
         }
+
     }
 
     public void draw(){
@@ -82,17 +84,7 @@ public class GameManager {
             task.draw(canvas);
         }
 
-
-        //ballの状態を表示
-        List<String> statTextList = new ArrayList<>();
-        statTextList.add("X: " + mainBall.centerX);
-        statTextList.add("Y: " + mainBall.centerY);
-        statTextList.add("VX: " + mainBall.velX);
-        statTextList.add("VY: " + mainBall.velY);
-        for (int i = 0; i < statTextList.size(); i++) {
-            canvas.drawText(statTextList.get(i), 10, 100 + (50 * i), TEXT_PAINT);
-
-        }
+        showBallStatus();
 
         //ゲージを表示
         /*
@@ -101,6 +93,18 @@ public class GameManager {
             canvas.drawRect(0,0,width * (elapsedTime / MAX_TOUCH_TIME),POWER_GAUGE_HEIGHT,PAINT_POWER_GAUGE);
         }
         */
+    }
+
+    public void showBallStatus(){
+        //ballの状態を表示
+        List<String> statTextList = new ArrayList<>();
+        statTextList.add("X: " + mainBall.centerX);
+        statTextList.add("Y: " + mainBall.centerY);
+        statTextList.add("VX: " + mainBall.velX);
+        statTextList.add("VY: " + mainBall.velY);
+        for (int i = 0; i < statTextList.size(); i++) {
+            canvas.drawText(statTextList.get(i), 10, 100 + (50 * i), TEXT_PAINT);
+        }
     }
 
     public void initializeWorld(){
@@ -112,10 +116,7 @@ public class GameManager {
 
         //追従者を生成
         for (int i = 0; i < 20; i++) {
-            float offsetX = rand.nextInt(viewWidth);
-            float offsetY = rand.nextInt(viewHeight);
-
-            createFollowBall(offsetX, offsetY, ballR, mainBall);
+            createFollowBallRandom(viewWidth, viewHeight);
         }
     }
 
@@ -137,5 +138,18 @@ public class GameManager {
         fb.setColor(Color.YELLOW);
         taskList.add(fb);
         return fb;
+    }
+
+    public FollowBall createFollowBallRandom(int rangeX,int rangeY){
+        float fbx = rand.nextInt(rangeX);
+        float fby = rand.nextInt(rangeY);
+        float fbr = 10;
+        return createFollowBall(fbx, fby, fbr, mainBall);
+    }
+
+    //一定確率のくじを引く
+    public boolean lot(int hit,int max){
+        int r = rand.nextInt(max) + 1;
+        return (r <= hit);
     }
 }

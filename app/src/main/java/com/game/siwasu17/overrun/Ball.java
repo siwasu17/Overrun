@@ -115,7 +115,18 @@ public class Ball implements GameTask {
     }
 
     @Override
+    public void offset(float x, float y) {
+        //強制的な座標補正
+        this.centerX += x;
+        this.centerY += y;
+    }
+
+    @Override
     public void draw(Canvas canvas){
-        canvas.drawCircle(centerX,centerY,radius,paint);
+        int w = canvas.getWidth();
+        int h = canvas.getHeight();
+        if((centerX <= w) && (centerY <= h)) {
+            canvas.drawCircle(centerX, centerY, radius, paint);
+        }
     }
 }

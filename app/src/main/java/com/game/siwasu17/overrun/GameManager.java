@@ -17,12 +17,12 @@ public class GameManager {
     private static final Paint RECT_PAINT = new Paint();
 
     //世界の大きさ
-    private final int WORLD_MAX_WIDTH = 1000;
-    private final int WORLD_MAX_HEIGHT = 1000;
+    private final int WORLD_MAX_WIDTH = 8000;
+    private final int WORLD_MAX_HEIGHT = 8000;
 
     //世界における描画領域の位置
-    private final int VIEW_OFFSET_X = 500;
-    private final int VIEW_OFFSET_Y = 500;
+    private final int VIEW_OFFSET_X = 2000;
+    private final int VIEW_OFFSET_Y = 2000;
 
     //描画領域における可動範囲の位置
     private final int MOVABLE_OFFSET_X;
@@ -102,10 +102,32 @@ public class GameManager {
                 MOVABLE_OFFSET_Y + movableRect.height());
     }
 
-
     public void update(){
 
         mainBall.update();
+
+        //可動領域を超えたか判定
+        if(!movableRect.contains((int)mainBall.centerX,(int)mainBall.centerY)){
+            int deltaX = 0;
+            int deltaY = 0;
+            if(movableRect.left > mainBall.centerX){
+                deltaX = (int)Math.floor(mainBall.centerX - movableRect.left);
+            }
+            if(movableRect.right < mainBall.centerX){
+                deltaX = (int)Math.ceil(mainBall.centerX - movableRect.right);
+            }
+            if(movableRect.top > mainBall.centerY){
+                deltaY = (int)Math.floor(mainBall.centerY - movableRect.top);
+            }
+            if(movableRect.bottom < mainBall.centerY){
+                deltaY = (int)Math.ceil(mainBall.centerY - movableRect.bottom);
+            }
+
+            //描画、可動領域を一緒に移動
+            viewRect.offset(deltaX,deltaY);
+            movableRect.offset(deltaX,deltaY);
+
+        }
 
         for(GameTask task: taskList){
             task.update();
@@ -122,6 +144,7 @@ public class GameManager {
         //メインキャラ
         mainBall.draw(canvas,viewRect);
 
+        //その他
         for(GameTask task: taskList){
             task.draw(canvas,viewRect);
         }
@@ -133,8 +156,8 @@ public class GameManager {
     public void showStatusText(){
         //ballの状態を表示
         List<String> statTextList = new ArrayList<>();
-        statTextList.add("X: " + mainBall.centerX);
-        statTextList.add("Y: " + mainBall.centerY);
+        statTextList.add("[ABS] X: " + mainBall.centerX);
+        statTextList.add("[ABS] Y: " + mainBall.centerY);
         statTextList.add("VX: " + mainBall.velX);
         statTextList.add("VY: " + mainBall.velY);
 
@@ -163,14 +186,14 @@ public class GameManager {
         float halfHeight = viewHeight/2;
         float ballR = 10;
         //メインキャラ生成
-        mainBall = createBall(halfWidth, halfHeight, ballR);
+        mainBall = createBall(VIEW_OFFSET_X + halfWidth,VIEW_OFFSET_Y +  halfHeight, ballR);
 
         //追従者を生成
-        /*
-        for (int i = 0; i < 20; i++) {
-            createFollowBallRandom(viewWidth, viewHeight);
+
+        for (int i = 0; i < 500; i++) {
+            createFollowBallRandom(WORLD_MAX_WIDTH, WORLD_MAX_HEIGHT);
         }
-        */
+
     }
 
 

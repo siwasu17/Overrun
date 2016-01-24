@@ -68,7 +68,6 @@ public class GameView extends SurfaceView
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         startDrawThread();
-        //startSensor();
     }
 
     @Override
@@ -79,7 +78,6 @@ public class GameView extends SurfaceView
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         stopDrawThread();
-        //stopSensor();
     }
 
     /**

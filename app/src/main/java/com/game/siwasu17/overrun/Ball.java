@@ -3,6 +3,7 @@ package com.game.siwasu17.overrun;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 
 /**
  * 操作するメインキャラ
@@ -122,11 +123,11 @@ public class Ball implements GameTask {
     }
 
     @Override
-    public void draw(Canvas canvas){
-        int w = canvas.getWidth();
-        int h = canvas.getHeight();
-        if((centerX <= w) && (centerY <= h)) {
-            canvas.drawCircle(centerX, centerY, radius, paint);
+    public void draw(Canvas canvas,Rect viewRect){
+        //TODO: ここはあとで画像の四角形のintersectにする
+        if(viewRect.contains((int)centerX,(int)centerY)) {
+            canvas.drawCircle(centerX - viewRect.left, centerY - viewRect.top, radius, paint);
         }
+
     }
 }

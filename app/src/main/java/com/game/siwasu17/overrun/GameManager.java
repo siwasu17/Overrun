@@ -51,8 +51,6 @@ public class GameManager {
     int viewWidth;
     int viewHeight;
 
-    float frontierY;
-
     private final Random rand = new Random();
 
     Ball mainBall;//操作キャラはゲーム全体に影響があるのでここで個別管理
@@ -104,14 +102,14 @@ public class GameManager {
                 MOVABLE_OFFSET_Y + movableRect.height());
     }
 
+
     public void update(){
-        //画面スクロール用
+
         mainBall.update();
 
         for(GameTask task: taskList){
             task.update();
         }
-
     }
 
     public void draw(){
@@ -122,10 +120,10 @@ public class GameManager {
         canvas.drawRect(getRelativeMovableRect(), RECT_PAINT);
 
         //メインキャラ
-        mainBall.draw(canvas);
+        mainBall.draw(canvas,viewRect);
 
         for(GameTask task: taskList){
-            task.draw(canvas);
+            task.draw(canvas,viewRect);
         }
 
         showStatusText();

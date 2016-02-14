@@ -26,7 +26,6 @@ public class Ball implements GameTask {
     float accelY;
     float velX;
     float velY;
-    private final Color color = new Color();
 
     public Ball(float x,float y,float r) {
         this.centerX = x;
@@ -43,7 +42,7 @@ public class Ball implements GameTask {
         this.isBraking = true;
 
         //初期色
-        paint.setColor(this.color.argb(255,100,255,255));
+        paint.setColor(Color.argb(255, 100, 255, 255));
         paint.setAntiAlias(true);
     }
 

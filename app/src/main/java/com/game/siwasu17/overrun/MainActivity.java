@@ -27,7 +27,7 @@ public class MainActivity extends ActionBarActivity implements GameView.Callback
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        gameView.getGestureDetector().onTouchEvent(event);
+        gameView.handleTouchEvent(event);
         return super.onTouchEvent(event);
     }
 

@@ -134,9 +134,9 @@ public class GameView extends SurfaceView
         }
     };
 
-    //Activityのタッチイベントから呼んでもらうため
-    public GestureDetector getGestureDetector() {
-        return this.mDetector;
+    //ここで上位層からイベントオブジェクトをもらって取り回す
+    public void handleTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
     }
 
     /**

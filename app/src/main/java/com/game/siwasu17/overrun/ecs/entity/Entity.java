@@ -8,9 +8,9 @@ import java.util.List;
 /**
  * Created by yasu on 16/02/14.
  */
-public class BaseEntity {
+public class Entity {
     public long eid;
-    public BaseEntity(long eid) {
+    public Entity(long eid) {
         this.eid = eid;
     }
 

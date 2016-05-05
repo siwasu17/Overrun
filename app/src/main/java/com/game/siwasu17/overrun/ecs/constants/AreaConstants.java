@@ -9,4 +9,6 @@ public class AreaConstants {
 
     //TODO: ディスプレイサイズ系は動的にとってconfigとして持っているのが良さそう
 
+
+
 }

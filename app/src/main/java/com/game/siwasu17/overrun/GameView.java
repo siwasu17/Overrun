@@ -118,17 +118,13 @@ public class GameView extends SurfaceView
         @Override
         public void onLongPress(MotionEvent e) {
             Log.i(LOG_TAG, "LongPress!!!");
-            Ball ball = gm.getMainBall();
-            ball.forceBoost();
+
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
             Log.i(LOG_TAG, "[Flick] X:" + velocityX + " Y:" + velocityY);
-            Ball ball = gm.getMainBall();
-            ball.setVelocity(velocityX / 100, velocityY / 100);
-
 
             return false;
         }
@@ -197,9 +193,4 @@ public class GameView extends SurfaceView
         gm.draw();
     }
 
-    /**
-     * Game Objects
-     */
-    private Ball ball;
-    private ArrayList<Ball> followers = new ArrayList<>();
 }

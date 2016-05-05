@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.util.ArrayList;
+import com.game.siwasu17.overrun.ecs.manager.GameManager;
 
 
 /**

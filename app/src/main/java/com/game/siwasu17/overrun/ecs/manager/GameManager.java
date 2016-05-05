@@ -1,9 +1,14 @@
-package com.game.siwasu17.overrun;
+package com.game.siwasu17.overrun.ecs.manager;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+
+
+import com.game.siwasu17.overrun.ecs.factory.EntityFactory;
+import com.game.siwasu17.overrun.ecs.system.MoveSystem;
+import com.game.siwasu17.overrun.ecs.system.RenderSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +30,20 @@ public class GameManager {
     }
 
     Canvas canvas;
+    //画面全体
     Rect viewRect;
     //達成タスク描画領域
     Rect parkRect;
     //未完了タスク描画領域
     Rect boxRect;
+
+    //エンティティ管理系
+    EntityManager entityManager;
+    EntityFactory entityFactory;
+
+    //システム系
+    MoveSystem moveSystem;
+    RenderSystem renderSystem;
 
     private final Random rand = new Random();
 
@@ -44,16 +58,32 @@ public class GameManager {
         this.parkRect = new Rect(0,0,width,(int)(height * horizonDivideRate));
         this.boxRect = new Rect(0,parkRect.bottom,width,height);
 
+        entityManager = new EntityManager();
+        entityFactory = new EntityFactory(entityManager);
+        moveSystem = new MoveSystem(entityManager);
+        renderSystem = new RenderSystem(entityManager);
+
     }
 
     public void update() {
         //各システムのupdateを呼び出す
         //update,drawの順序依存が生じるようならGameManagerは捨てる
+        moveSystem.update();
+        renderSystem.update();
     }
 
     public void draw() {
         //背景
         canvas.drawColor(Color.BLACK);
+
+        /*
+        //TODO: ここのRectの型について調査
+        canvas.drawRect(parkRect, Color.GREEN);
+        canvas.drawRect(boxRect,Color.GRAY);
+        */
+
+        //エンティティ描画
+        renderSystem.draw();
 
         showStatusText();
     }

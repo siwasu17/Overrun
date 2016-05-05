@@ -16,7 +16,7 @@ public class MoveSystem extends BaseSystem{
         super(entityManager);
     }
 
-    void update() {
+    public void update() {
         Set<Entity> targetEntities = entityManager.getAllEntitiesPosessingComponentOfClass(MoveComponent.class);
         for (Entity entity : targetEntities) {
             //動作に関連するコンポーネントを取り出す

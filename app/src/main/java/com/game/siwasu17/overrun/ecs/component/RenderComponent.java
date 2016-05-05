@@ -8,6 +8,9 @@ public class RenderComponent extends BaseComponent {
     float x;
     float y;
 
+    //アニメーション系情報
+    //TODO:画像のストックを管理する方法を整理(あとで)
+
     public RenderComponent(float x, float y) {
         this.x = x;
         this.y = y;
